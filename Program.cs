@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MobileProviderBillPaymentSystem.Context;
 using System.Text;
-using System.Threading.RateLimiting;
+
 
 
 
@@ -107,7 +107,6 @@ app.UseSwaggerUI(c =>
 });
 
 
-app.UseRateLimiter();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
