@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MobileProviderBillPaymentSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be360ad0bc2c5d0ea6722869d10af1a307f9fbc3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c67a962c90afd9978249c21c54702f9f63f542b")]
 [assembly: System.Reflection.AssemblyProductAttribute("MobileProviderBillPaymentSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MobileProviderBillPaymentSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
