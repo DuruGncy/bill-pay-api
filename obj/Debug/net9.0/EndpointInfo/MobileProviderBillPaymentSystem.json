@@ -1,0 +1,224 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Mobile Provider API",
+    "version": "v1"
+  },
+  "paths": {
+    "/v1/BankingApp/query-bill": {
+      "get": {
+        "tags": [
+          "BankingApp"
+        ],
+        "parameters": [
+          {
+            "name": "subscriberNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/MobileProviderApp/query-bill": {
+      "get": {
+        "tags": [
+          "MobileProviderApp"
+        ],
+        "parameters": [
+          {
+            "name": "subscriberNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/MobileProviderApp/query-bill-detailed": {
+      "get": {
+        "tags": [
+          "MobileProviderApp"
+        ],
+        "parameters": [
+          {
+            "name": "subscriberNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/Token/token": {
+      "post": {
+        "tags": [
+          "Token"
+        ],
+        "parameters": [
+          {
+            "name": "jwtKey",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/WebSite/pay-bill": {
+      "post": {
+        "tags": [
+          "WebSite"
+        ],
+        "parameters": [
+          {
+            "name": "subscriberNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/WebSite/admin/add-bill": {
+      "post": {
+        "tags": [
+          "WebSite"
+        ],
+        "parameters": [
+          {
+            "name": "subscriberNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/WebSite/admin/add-bill/batch": {
+      "post": {
+        "tags": [
+          "WebSite"
+        ],
+        "parameters": [
+          {
+            "name": "subscriberNo",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter 'Bearer {token}'",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

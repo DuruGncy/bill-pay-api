@@ -1,0 +1,149 @@
+[
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.WebSiteController",
+    "Method": "AddBill",
+    "RelativePath": "api/v1/WebSite/admin/add-bill",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subscriberNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.WebSiteController",
+    "Method": "AddBillBatch",
+    "RelativePath": "api/v1/WebSite/admin/add-bill/batch",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subscriberNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.WebSiteController",
+    "Method": "PayBill",
+    "RelativePath": "api/v1/WebSite/pay-bill",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subscriberNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.BankingAppController",
+    "Method": "QueryBill",
+    "RelativePath": "v1/BankingApp/query-bill",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subscriberNo",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.MobileProviderAppController",
+    "Method": "QueryBill",
+    "RelativePath": "v1/MobileProviderApp/query-bill",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subscriberNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.MobileProviderAppController",
+    "Method": "QueryBillDetailed",
+    "RelativePath": "v1/MobileProviderApp/query-bill-detailed",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subscriberNo",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.TokenController",
+    "Method": "GenerateToken",
+    "RelativePath": "v1/Token/token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "jwtKey",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
