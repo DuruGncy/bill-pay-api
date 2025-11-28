@@ -14,11 +14,12 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 // JWT settings from configuration
-var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwtSection["Key"] ?? "SuperSecretKey123!";
-var jwtIssuer = jwtSection["Issuer"] ?? "MobileProviderAPI";
-var jwtAudience = jwtSection["Audience"] ?? "MobileProviderClients";
+var jwtKey = builder.Configuration["Jwt_Key"] ?? "!";
+var jwtIssuer = builder.Configuration["Jwt_Issuer"] ?? "";
+var jwtAudience = builder.Configuration["Jwt_Audience"] ?? "";
+
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
+
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -92,9 +93,6 @@ builder.Services.AddApiVersioning(options =>
         options.GroupNameFormat = "'v'VVV"; // e.g., v1
         options.SubstituteApiVersionInUrl = true;
     });
-
-builder.Services.AddDbContext<BillingDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("BillingDb")));
 
 
 
