@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
+
 
 namespace MobileProviderBillPaymentSystem.Controllers;
 
@@ -15,7 +14,6 @@ public class MobileProviderAppController : ControllerBase
 {
     [HttpGet("query-bill")]
     [Authorize]
-    [EnableRateLimiting("QueryBillLimiter")]
     public IActionResult QueryBill([FromQuery] string subscriberNo, [FromQuery] string month)
     {
         if (string.IsNullOrWhiteSpace(subscriberNo))

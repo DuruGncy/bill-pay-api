@@ -95,38 +95,6 @@ builder.Services.AddApiVersioning(options =>
     });
 
 
-
-// Configure Rate Limiting
-builder.Services.AddRateLimiter(options =>
-{
-    options.AddPolicy("QueryBillLimiter", httpContext =>
-    {
-        // Identify subscriber
-        var subscriberNo = httpContext.Request.Query["subscriberNo"].ToString();
-        if (string.IsNullOrEmpty(subscriberNo))
-            subscriberNo = "anonymous";
-
-        // Token Bucket: 3 requests per day
-        return RateLimitPartition.GetTokenBucketLimiter(subscriberNo, key => new TokenBucketRateLimiterOptions
-        {
-            TokenLimit = 3,
-            TokensPerPeriod = 3,
-            ReplenishmentPeriod = TimeSpan.FromDays(1),
-            QueueLimit = 0,
-            AutoReplenishment = true
-        });
-    });
-
-    options.OnRejected = async (context, token) =>
-    {
-        context.HttpContext.Response.StatusCode = 429;
-        await context.HttpContext.Response.WriteAsync("Rate limit exceeded", cancellationToken: token);
-    };
-});
-
-
-
-
 var app = builder.Build();
 
 // Swagger middleware (enabled in Development)
