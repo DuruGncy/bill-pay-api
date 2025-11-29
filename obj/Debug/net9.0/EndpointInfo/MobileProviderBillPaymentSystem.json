@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.4",
   "info": {
-    "title": "Mobile Provider API 1.0",
+    "title": "Mobile Provider API Gateway",
     "version": "v1"
   },
   "paths": {
@@ -373,27 +373,32 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Bill"
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "clientDate": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
                 }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Bill"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Bill"
+              },
+              "encoding": {
+                "description": {
+                  "style": "form"
+                },
+                "clientDate": {
+                  "style": "form"
+                },
+                "file": {
+                  "style": "form"
                 }
               }
             }
@@ -555,14 +560,12 @@
       "Bearer": {
         "type": "http",
         "description": "Enter 'Bearer {token}'",
-        "scheme": "Bearer",
+        "scheme": "bearer",
         "bearerFormat": "JWT"
       }
     }
   },
   "security": [
-    {
-      "Bearer": [ ]
-    }
+    { }
   ]
 }

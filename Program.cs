@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MobileProviderBillPaymentSystem.Context;
 using MobileProviderBillPaymentSystem.Gateway;
-using MobileProviderBillPaymentSystem.OperationFilter;
 using MobileProviderBillPaymentSystem.Services;
 using MobileProviderBillPaymentSystem.Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
