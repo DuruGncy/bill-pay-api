@@ -24,13 +24,15 @@ public class TokenController : ControllerBase
 
     [HttpPost("token")]
     [AllowAnonymous]
-    public IActionResult GenerateToken([FromQuery] string? jwtKey)
+    public IActionResult GenerateToken()
     {
-        // Prefer provided key, fallback to configuration
-        var keyString = _configuration["Jwt_Audience"] ?? "SuperSecretKey123!";
+        // Correct mapping
+        var keyString = _configuration["Jwt_Key"];         // SIGNING KEY
+        var issuer = _configuration["Jwt_Issuer"];      // ISSUER
+        var audience = _configuration["Jwt_Audience"];    // AUDIENCE
 
-        var issuer = _configuration["Jwt_Issuer"] ?? "MobileProviderAPI";
-        var audience = _configuration["Jwt_Key"] ?? "MobileProviderClients";
+        if (string.IsNullOrEmpty(keyString))
+            return BadRequest("JWT signing key is missing.");
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -40,7 +42,9 @@ public class TokenController : ControllerBase
         var token = new JwtSecurityToken(
             issuer: issuer,
             audience: audience,
-            claims: new[] { new Claim(ClaimTypes.Name, "testuser") },
+            claims: new[] {
+            new Claim(ClaimTypes.Name, "testuser")
+            },
             expires: expires,
             signingCredentials: creds
         );
@@ -51,4 +55,5 @@ public class TokenController : ControllerBase
             expires
         });
     }
+
 }
