@@ -10,3 +10,9 @@ public class Subscriber
 
     public ICollection<Bill> Bills { get; set; } = new List<Bill>();
 }
+
+public class SubscriberDto
+{
+    public string SubscriberNo { get; set; }
+    public string FullName { get; set; }
+}

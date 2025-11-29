@@ -43,7 +43,7 @@ public class SubscriberController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> AddSubscriber([FromBody] Subscriber subscriber)
+    public async Task<IActionResult> AddSubscriber([FromBody] SubscriberDto subscriber)
     {
         var created = await _subscriberService.AddSubscriberAsync(subscriber);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -58,3 +58,5 @@ public class SubscriberController : ControllerBase
         return Ok(updated);
     }
 }
+
+

@@ -35,11 +35,19 @@ public class SubscriberService : ISubscriberService
             .FirstOrDefaultAsync(s => s.SubscriberNo == subscriberNo);
     }
 
-    public async Task<Subscriber> AddSubscriberAsync(Subscriber subscriber)
+    public async Task<Subscriber> AddSubscriberAsync(SubscriberDto subscriber)
     {
-        _db.Subscribers.Add(subscriber);
+        // Map DTO -> entity
+        var entity = new Subscriber
+        {
+            SubscriberNo = subscriber.SubscriberNo,
+            FullName = subscriber.FullName,
+            Bills = new List<Bill>()
+        };
+
+        _db.Subscribers.Add(entity);
         await _db.SaveChangesAsync();
-        return subscriber;
+        return entity;
     }
 
     public async Task<Subscriber?> UpdateSubscriberAsync(int id, Subscriber subscriber)

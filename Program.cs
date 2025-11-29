@@ -150,7 +150,7 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseMiddleware<GatewayMiddleware>();
+app.UseMiddleware<GatewayMiddleware>();
 app.MapControllers();
 
 app.Run();
