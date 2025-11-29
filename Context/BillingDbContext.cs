@@ -13,6 +13,8 @@ public class BillingDbContext : DbContext
     public DbSet<Bill> Bills { get; set; }
     public DbSet<Payment> Payments { get; set; }
 
+    public DbSet<User> Users { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Bill>(entity =>

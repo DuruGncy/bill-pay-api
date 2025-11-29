@@ -118,6 +118,7 @@ builder.Services.AddAuthorization();
 // --- Swagger + API Versioning integration ---
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<ISubscriberService, SubscriberService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 
 // Add controllers
