@@ -31,9 +31,9 @@ builder.Services.AddDbContext<BillingDbContext>(options =>
 
 
 // JWT settings from configuration
-var jwtKey = builder.Configuration["Jwt_Key"];
-var jwtIssuer = builder.Configuration["Jwt_Issuer"];
-var jwtAudience = builder.Configuration["Jwt_Audience"];
+var jwtKey = builder.Configuration["JwtKey"];
+var jwtIssuer = builder.Configuration["JwtIssuer"];
+var jwtAudience = builder.Configuration["JwtAudience"];
 var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
 
 

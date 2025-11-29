@@ -27,9 +27,9 @@ public class TokenController : ControllerBase
     public IActionResult GenerateToken()
     {
         // Correct mapping
-        var keyString = _configuration["Jwt_Key"];         // SIGNING KEY
-        var issuer = _configuration["Jwt_Issuer"];      // ISSUER
-        var audience = _configuration["Jwt_Audience"];    // AUDIENCE
+        var keyString = _configuration["JwtKey"];         // SIGNING KEY
+        var issuer = _configuration["JwtIssuer"];      // ISSUER
+        var audience = _configuration["JwtAudience"];    // AUDIENCE
 
         if (string.IsNullOrEmpty(keyString))
             return BadRequest("JWT signing key is missing.");
