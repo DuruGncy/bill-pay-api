@@ -100,7 +100,7 @@ public class WebSiteController : ControllerBase
     [SwaggerOperation(Summary = "Upload a CSV file containing bills")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddBillBatch([FromForm(Name = "file")] IFormFile file)
+    public async Task<IActionResult> AddBillBatch([FromForm] string description, [FromForm] DateTime clientDate, IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");

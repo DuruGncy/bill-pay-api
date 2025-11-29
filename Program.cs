@@ -80,7 +80,7 @@ builder.Services.AddSwaggerGen(c =>
     };
     c.AddSecurityRequirement(securityReq);
 
-    c.OperationFilter<FileUploadOperationFilter>();
+   
 
 });
 
