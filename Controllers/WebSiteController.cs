@@ -1,8 +1,9 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MobileProviderBillPaymentSystem.Services.Interfaces;
 using MobileProviderBillPaymentSystem.Models;
+using MobileProviderBillPaymentSystem.Services.Interfaces;
+using System.Globalization;
 
 namespace MobileProviderBillPaymentSystem.Controllers;
 
@@ -91,21 +92,42 @@ public class WebSiteController : ControllerBase
     /// <summary>
     /// Admin: Add bills in batch (list of bills).
     /// </summary>
+    [Consumes("multipart/form-data")]
     [HttpPost("admin/add-bill/batch")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddBillBatch([FromBody] List<Bill> bills)
+    public async Task<IActionResult> AddBillBatch([FromForm] IFormFile file)
     {
-        if (bills == null || !bills.Any())
-            return BadRequest("No bills provided for batch creation.");
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded.");
+
+        var bills = new List<Bill>();
+
+        using (var stream = file.OpenReadStream())
+        using (var reader = new StreamReader(stream))
+        {
+            string? line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                var columns = line.Split(','); // naive CSV parsing
+                bills.Add(new Bill
+                {
+                    SubscriberId = int.Parse(columns[0]),
+                    BillMonth = DateTime.ParseExact(columns[1], "yyyy-MM", CultureInfo.InvariantCulture),
+                    BillTotal = decimal.Parse(columns[2]),
+                    BillDetails = columns.Length > 3 ? columns[3] : null
+                });
+            }
+        }
 
         await _billingService.AddBillBatchAsync(bills);
 
         return Ok(new
         {
             Message = "Batch bill creation successful.",
-            Count = bills.Count
+            bills.Count
         });
     }
+
 }
