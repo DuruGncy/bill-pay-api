@@ -23,13 +23,15 @@ public class GatewayMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         // Check for the custom header
-        if (!context.Request.Headers.TryGetValue("X-Gateway-Secret", out var secret)
-            || secret != _gatewaySecret)
+        if (context.Request.Path.StartsWithSegments("/api") &&
+     (!context.Request.Headers.TryGetValue("X-Gateway-Secret", out var secret)
+      || secret != _gatewaySecret))
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsync("Access denied. Requests must come from the API gateway.");
             return;
         }
+
 
         await _next(context);
     }

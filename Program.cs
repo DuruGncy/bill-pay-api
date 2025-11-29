@@ -135,11 +135,12 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger"; // swagger UI at /swagger
 });
 
-app.UseMiddleware<GatewayMiddleware>();
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<GatewayMiddleware>();
 app.MapControllers();
 
 app.Run();
