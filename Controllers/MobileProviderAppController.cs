@@ -9,7 +9,7 @@ namespace MobileProviderBillPaymentSystem.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("v{version:apiVersion}/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class MobileProviderAppController : ControllerBase
 {
     [HttpGet("query-bill")]

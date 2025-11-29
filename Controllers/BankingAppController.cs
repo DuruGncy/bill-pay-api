@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MobileProviderBillPaymentSystem.Controllers;
 
-[Route("v{version:apiVersion}/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1.0")]
 [ApiController]
 public class BankingAppController : ControllerBase
