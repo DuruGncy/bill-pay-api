@@ -12,7 +12,12 @@ public class GatewayMiddleware
     {
         _next = next;
         // Load the secret from configuration
-        _gatewaySecret = config["Gateway_Secret"] ?? "default-secret";
+        _gatewaySecret = config["Gateway_Secret"];
+
+        if (string.IsNullOrWhiteSpace(_gatewaySecret))
+        {
+            throw new InvalidOperationException($"gateway secret is not set.");
+        }
     }
 
     public async Task InvokeAsync(HttpContext context)
