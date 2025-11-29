@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using MobileProviderBillPaymentSystem.Models;
 using MobileProviderBillPaymentSystem.Services.Interfaces;
 using System.Globalization;
+using Swashbuckle.AspNetCore.Annotations;
+
 
 namespace MobileProviderBillPaymentSystem.Controllers;
 
@@ -95,6 +97,7 @@ public class WebSiteController : ControllerBase
     [HttpPost("admin/add-bill/batch")]
     [Authorize]
     [Consumes("multipart/form-data")]
+    [SwaggerOperation(Summary = "Upload a CSV file containing bills")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddBillBatch([FromForm] IFormFile file)
