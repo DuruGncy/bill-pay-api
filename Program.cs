@@ -104,38 +104,6 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
     };
-
-    // Add events to surface why authentication is failing
-    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
-    {
-        OnMessageReceived = ctx =>
-        {
-            // Useful for debugging: ensure token is being read from Authorization header
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("JwtAuth");
-            logger.LogDebug("OnMessageReceived. Authorization header present: {hasAuth}",
-                ctx.Request.Headers.ContainsKey("Authorization"));
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = ctx =>
-        {
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("JwtAuth");
-            logger.LogInformation("Token validated for {name}", ctx.Principal?.Identity?.Name ?? "<no-name>");
-            return Task.CompletedTask;
-        },
-        OnAuthenticationFailed = ctx =>
-        {
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("JwtAuth");
-            logger.LogError(ctx.Exception, "Authentication failed");
-            return Task.CompletedTask;
-        },
-        OnChallenge = ctx =>
-        {
-            // This runs when authentication fails and a 401 is about to be returned
-            var logger = ctx.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("JwtAuth");
-            logger.LogWarning("Authentication challenge. Error: {error}; Description: {desc}", ctx.Error, ctx.ErrorDescription);
-            return Task.CompletedTask;
-        }
-    };
 });
 
 builder.Services.AddAuthorization();
@@ -174,7 +142,7 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<GatewayMiddleware>();
+//app.UseMiddleware<GatewayMiddleware>();
 app.MapControllers();
 
 app.Run();
