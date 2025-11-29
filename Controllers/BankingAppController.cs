@@ -1,7 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MobileProviderBillPaymentSystem.Services.Interfaces;
 
 namespace MobileProviderBillPaymentSystem.Controllers;
 
@@ -10,21 +10,28 @@ namespace MobileProviderBillPaymentSystem.Controllers;
 [ApiController]
 public class BankingAppController : ControllerBase
 {
+    private readonly IBillingService _billingService;
+
+    public BankingAppController(IBillingService billingService)
+    {
+        _billingService = billingService;
+    }
+
+    /// <summary>
+    /// Returns all unpaid bills for the subscriber, grouped by month.
+    /// </summary>
     [HttpGet("query-bill")]
     [Authorize]
-    public IActionResult QueryBill([FromQuery] string subscriberNo)
+    public async Task<IActionResult> QueryBill([FromQuery] string subscriberNo)
     {
         if (string.IsNullOrWhiteSpace(subscriberNo))
             return BadRequest("Subscriber number is required.");
 
+        var result = await _billingService.QueryUnpaidBillsAsync(subscriberNo);
 
-        // TODO: call your service layer here
+        if (!result.Any())
+            return NotFound("No unpaid bills found for this subscriber.");
 
-        return Ok(new
-        {
-            SubscriberNo = subscriberNo,
-            BillTotal = 120.50,
-            PaidStatus = "NotPaid"
-        });
+        return Ok(result);
     }
 }

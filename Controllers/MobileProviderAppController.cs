@@ -1,43 +1,59 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using MobileProviderBillPaymentSystem.Services.Interfaces;
 
 namespace MobileProviderBillPaymentSystem.Controllers;
-
 
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class MobileProviderAppController : ControllerBase
 {
+    private readonly IBillingService _billingService;
+
+    public MobileProviderAppController(IBillingService billingService)
+    {
+        _billingService = billingService;
+    }
+
+    // ---------------------------------------------------------
+    // QUERY BILL (summary)
+    // ---------------------------------------------------------
     [HttpGet("query-bill")]
     [Authorize]
-    public IActionResult QueryBill([FromQuery] string subscriberNo, [FromQuery] string month)
+    public async Task<IActionResult> QueryBill(
+        [FromQuery] string subscriberNo,
+        [FromQuery] string month)
     {
         if (string.IsNullOrWhiteSpace(subscriberNo))
             return BadRequest("Subscriber number is required.");
 
-        if (string.IsNullOrWhiteSpace(month))
-            return BadRequest("Month is required.");
-
-        // TODO: call your service layer here
-
-        return Ok(new
+        if (!DateTime.TryParseExact(month, "yyyy-MM", null, System.Globalization.DateTimeStyles.None, out var billMonth))
         {
-            SubscriberNo = subscriberNo,
-            Month = month,
-            BillTotal = 120.50,
-            PaidStatus = "NotPaid"
-        });
+            return BadRequest("Invalid month format. Use yyyy-MM.");
+        }
+
+        try
+        {
+            var bill = await _billingService.QueryBillAsync(subscriberNo, billMonth);
+            if (bill == null)
+                return NotFound("No bill found for this subscriber and month.");
+
+            return Ok(bill);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error retrieving bill: {ex.Message}");
+        }
     }
 
-
-
+    // ---------------------------------------------------------
+    // QUERY BILL DETAILED (paged, list items)
+    // ---------------------------------------------------------
     [HttpGet("query-bill-detailed")]
     [Authorize]
-    public IActionResult QueryBillDetailed(
+    public async Task<IActionResult> QueryBillDetailed(
         [FromQuery] string subscriberNo,
         [FromQuery] string month,
         [FromQuery] int page = 1,
@@ -48,57 +64,27 @@ public class MobileProviderAppController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(month))
             return BadRequest("Month is required.");
+        if (!DateTime.TryParseExact(month, "yyyy-MM", null, System.Globalization.DateTimeStyles.None, out var billMonth))
+        {
+            return BadRequest("Invalid month format. Use yyyy-MM.");
+        }
 
         if (page < 1)
-            return BadRequest("Page must be greater than or equal to 1.");
+            return BadRequest("Page must be >= 1.");
 
         if (pageSize < 1 || pageSize > 100)
             return BadRequest("PageSize must be between 1 and 100.");
 
-        // Mock data generation (replace with real service call)
-        var items = new List<object>();
-        int totalItems = 25;
-        for (int i = 1; i <= totalItems; i++)
+        try
         {
-            var date = DateTime.UtcNow.Date.AddDays(-i);
-            items.Add(new
-            {
-                LineNumber = i,
-                Date = date.ToString("yyyy-MM-dd"),
-                Description = (i % 2 == 0) ? $"Call to +1-555-010{i:00}" : $"Data usage session #{i}",
-                Amount = Math.Round(1.25m * i, 2),
-                Tax = Math.Round(0.10m * (1.25m * i), 2),
-                Total = Math.Round((1.25m * i) * 1.10m, 2),
-                Paid = (i % 3 == 0) // every 3rd item marked paid
-            });
+            var result = await _billingService.QueryBillDetailedAsync(
+                subscriberNo, billMonth, page, pageSize);
+
+            return Ok(result);
         }
-
-        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-        int startIndex = (page - 1) * pageSize;
-        List<object> pagedItems;
-
-        if (startIndex >= totalItems)
+        catch (Exception ex)
         {
-            pagedItems = new List<object>();
+            return StatusCode(500, $"Error retrieving bill details: {ex.Message}");
         }
-        else
-        {
-            int take = Math.Min(pageSize, totalItems - startIndex);
-            pagedItems = items.GetRange(startIndex, take);
-        }
-
-        var response = new
-        {
-            SubscriberNo = subscriberNo,
-            Month = month,
-            Page = page,
-            PageSize = pageSize,
-            TotalItems = totalItems,
-            TotalPages = totalPages,
-            Items = pagedItems
-        };
-
-        return Ok(response);
     }
 }
-
