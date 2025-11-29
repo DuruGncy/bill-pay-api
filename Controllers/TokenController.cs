@@ -35,7 +35,7 @@ public class TokenController : ControllerBase
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expires = DateTime.UtcNow.AddHours(1);
+        var expires = DateTime.UtcNow.AddHours(2);
 
         var token = new JwtSecurityToken(
             issuer: issuer,

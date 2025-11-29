@@ -28,6 +28,7 @@ public class WebSiteController : ControllerBase
     [HttpPost("pay-bill")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> PayBill(
         [FromQuery] string subscriberNo,
         [FromQuery] string month,
@@ -63,6 +64,7 @@ public class WebSiteController : ControllerBase
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AddBill(
         [FromQuery] string subscriberNo,
         [FromQuery] string month,
@@ -100,7 +102,8 @@ public class WebSiteController : ControllerBase
     [SwaggerOperation(Summary = "Upload a CSV file containing bills")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddBillBatch([FromForm] string description, [FromForm] DateTime clientDate, IFormFile file)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> AddBillBatch(IFormFile file)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");

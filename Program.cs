@@ -30,8 +30,6 @@ builder.Services.AddDbContext<BillingDbContext>(options =>
             errorCodesToAdd: null)));
 
 
-
-
 // JWT settings from configuration
 var jwtKey = builder.Configuration["Jwt_Key"] ?? "!";
 var jwtIssuer = builder.Configuration["Jwt_Issuer"] ?? "";
