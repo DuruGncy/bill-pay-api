@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MobileProviderBillPaymentSystem.Models;
 
@@ -7,6 +8,8 @@ public class Bill
     public int Id { get; set; }
 
     public int SubscriberId { get; set; }
+
+    [JsonIgnore]
     public Subscriber Subscriber { get; set; } = null!;
 
     [Column(TypeName = "date")]

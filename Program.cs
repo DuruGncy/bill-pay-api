@@ -85,8 +85,14 @@ builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<ISubscriberService, SubscriberService>();
 
 
-// Add services
-builder.Services.AddControllers();
+// Add controllers
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
+
 
 var app = builder.Build();
 

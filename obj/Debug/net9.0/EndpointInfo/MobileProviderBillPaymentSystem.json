@@ -440,9 +440,6 @@
             "type": "integer",
             "format": "int32"
           },
-          "subscriber": {
-            "$ref": "#/components/schemas/Subscriber"
-          },
           "billMonth": {
             "type": "string",
             "format": "date-time"
