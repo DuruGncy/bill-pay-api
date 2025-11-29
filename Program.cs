@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MobileProviderBillPaymentSystem.Context;
+using MobileProviderBillPaymentSystem.Gateway;
 using MobileProviderBillPaymentSystem.Services;
 using MobileProviderBillPaymentSystem.Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -42,7 +43,7 @@ var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
 // --- API Versioning ---
 builder.Services.AddApiVersioning(options => { 
     options.AssumeDefaultVersionWhenUnspecified = true; 
-    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0); 
+    options.DefaultApiVersion = new ApiVersion(1, 0); 
     options.ReportApiVersions = true; 
 }).AddApiExplorer(options =>
 {
@@ -79,8 +80,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // --- Swagger + API Versioning integration ---
-builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
-
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<ISubscriberService, SubscriberService>();
 
@@ -109,6 +108,8 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger"; // swagger UI at /swagger
 });
 
+app.UseMiddleware<GatewayMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -116,46 +117,3 @@ app.MapControllers();
 
 app.Run();
 
-// --- Helper class to generate Swagger docs per API version ---
-public class ConfigureSwaggerOptions : Microsoft.Extensions.Options.IConfigureOptions<SwaggerGenOptions>
-{
-    private readonly IApiVersionDescriptionProvider _provider;
-    public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
-    {
-        _provider = provider;
-    }
-
-    public void Configure(SwaggerGenOptions options)
-    {
-        foreach (var description in _provider.ApiVersionDescriptions)
-        {
-            options.SwaggerDoc(description.GroupName, new OpenApiInfo
-            {
-                Title = $"Mobile Provider API {description.ApiVersion}",
-                Version = description.GroupName
-            });
-
-            // Optional: JWT Bearer auth
-            var bearerScheme = new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = JwtBearerDefaults.AuthenticationScheme,
-                BearerFormat = "JWT",
-                Description = "Enter 'Bearer {token}'",
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = JwtBearerDefaults.AuthenticationScheme
-                }
-            };
-
-            options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, bearerScheme);
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                { bearerScheme, Array.Empty<string>() }
-            });
-        }
-    }
-}
