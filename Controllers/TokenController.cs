@@ -27,10 +27,10 @@ public class TokenController : ControllerBase
     public IActionResult GenerateToken([FromQuery] string? jwtKey)
     {
         // Prefer provided key, fallback to configuration
-        var keyString = _configuration["Jwt:Key"] ?? "SuperSecretKey123!";
+        var keyString = _configuration["Jwt_Audience"] ?? "SuperSecretKey123!";
 
-        var issuer = _configuration["Jwt:Issuer"] ?? "MobileProviderAPI";
-        var audience = _configuration["Jwt:Audience"] ?? "MobileProviderClients";
+        var issuer = _configuration["Jwt_Issuer"] ?? "MobileProviderAPI";
+        var audience = _configuration["Jwt_Key"] ?? "MobileProviderClients";
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
