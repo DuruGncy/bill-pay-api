@@ -53,33 +53,40 @@ builder.Services.AddApiVersioning(options => {
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Mobile Provider API Gateway",
+        Title = "Mobile Provider API",
         Version = "v1"
     });
 
-    // JWT Bearer support
-    var securityScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    // JWT Bearer definition
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Enter 'Bearer {token}'",
-    };
-    c.AddSecurityDefinition("Bearer", securityScheme);
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer {token}'"
+    });
 
-    var securityReq = new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    // Security requirement using reference
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { securityScheme, new string[] { } }
-    };
-    c.AddSecurityRequirement(securityReq);
-
-   
-
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
+
 
 
 // JWT authentication
