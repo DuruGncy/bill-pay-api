@@ -92,9 +92,9 @@ public class WebSiteController : ControllerBase
     /// <summary>
     /// Admin: Add bills in batch (list of bills).
     /// </summary>
-    [Consumes("multipart/form-data")]
     [HttpPost("admin/add-bill/batch")]
     [Authorize]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddBillBatch([FromForm] IFormFile file)
@@ -108,25 +108,52 @@ public class WebSiteController : ControllerBase
         using (var reader = new StreamReader(stream))
         {
             string? line;
+            bool isFirstLine = true;
+
             while ((line = await reader.ReadLineAsync()) != null)
             {
-                var columns = line.Split(','); // naive CSV parsing
+                // Skip header row
+                if (isFirstLine)
+                {
+                    isFirstLine = false;
+                    continue;
+                }
+
+                var columns = line.Split(',');
+
+                if (columns.Length < 3)
+                    continue; // skip invalid rows
+
+                if (!int.TryParse(columns[0].Trim(), out int subscriberId))
+                    continue; // skip invalid subscriber id
+
+                var billMonth = DateTime.ParseExact(columns[1].Trim(), "yyyy-MM", CultureInfo.InvariantCulture),
+      ;
+
+                if (!decimal.TryParse(columns[2].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal billTotal))
+                    continue; // skip invalid total
+
+                var billDetails = columns.Length > 3 ? columns[3].Trim() : null;
+
                 bills.Add(new Bill
                 {
-                    SubscriberId = int.Parse(columns[0]),
-                    BillMonth = DateTime.ParseExact(columns[1], "yyyy-MM", CultureInfo.InvariantCulture),
-                    BillTotal = decimal.Parse(columns[2]),
-                    BillDetails = columns.Length > 3 ? columns[3] : null
+                    SubscriberId = subscriberId,
+                    BillMonth = billMonth,
+                    BillTotal = billTotal,
+                    BillDetails = billDetails
                 });
             }
         }
+
+        if (!bills.Any())
+            return BadRequest("No valid bills found in the CSV file.");
 
         await _billingService.AddBillBatchAsync(bills);
 
         return Ok(new
         {
             Message = "Batch bill creation successful.",
-            bills.Count
+            Count = bills.Count
         });
     }
 
