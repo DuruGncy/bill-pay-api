@@ -127,7 +127,7 @@ public class WebSiteController : ControllerBase
                 if (!int.TryParse(columns[0].Trim(), out int subscriberId))
                     continue; // skip invalid subscriber id
 
-                var billMonth = DateTime.ParseExact(columns[1].Trim(), "yyyy-MM", CultureInfo.InvariantCulture),
+                var billMonth = DateTime.ParseExact(columns[1].Trim(), "yyyy-MM", CultureInfo.InvariantCulture);
       ;
 
                 if (!decimal.TryParse(columns[2].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal billTotal))
