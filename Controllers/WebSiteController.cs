@@ -139,7 +139,29 @@ public class WebSiteController : ControllerBase
                 if (!decimal.TryParse(columns[2].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal billTotal))
                     continue; // skip invalid total
 
-                var billDetails = columns.Length > 3 ? columns[3].Trim() : null;
+                string? billDetails = null;
+
+                if (columns.Length > 3)
+                {
+                    var raw = columns[3].Trim();
+
+                    if (!string.IsNullOrEmpty(raw))
+                    {
+                        try
+                        {
+                            // Try parsing it as JSON to validate
+                            using var doc = System.Text.Json.JsonDocument.Parse(raw);
+
+                            // Store it as raw JSON string
+                            billDetails = raw;
+                        }
+                        catch (System.Text.Json.JsonException)
+                        {
+                            // Invalid JSON, skip this row or set to null
+                            billDetails = null;
+                        }
+                    }
+                }
 
                 bills.Add(new Bill
                 {

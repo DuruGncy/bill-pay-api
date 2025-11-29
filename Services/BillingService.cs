@@ -180,6 +180,16 @@ public class BillingService : IBillingService
     {
         foreach (var bill in billList)
         {
+            var subscriber = await _db.Subscribers
+                .FirstOrDefaultAsync(s => s.Id == bill.SubscriberId);
+
+            if (subscriber == null)
+            {
+                // Skip or throw
+                Console.WriteLine($"Skipping bill for unknown subscriber {bill.SubscriberId}");
+                continue;
+            }
+
             bool exists = await _db.Bills.AnyAsync(b =>
                 b.SubscriberId == bill.SubscriberId &&
                 b.BillMonth == bill.BillMonth);
@@ -190,4 +200,5 @@ public class BillingService : IBillingService
 
         await _db.SaveChangesAsync();
     }
+
 }
