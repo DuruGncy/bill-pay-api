@@ -1,11 +1,14 @@
 ﻿using Asp.Versioning;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MobileProviderBillPaymentSystem.Models;
 using MobileProviderBillPaymentSystem.Services.Interfaces;
-using System.Globalization;
 using Swashbuckle.AspNetCore.Annotations;
-
+using System.Globalization;
+using System.Linq; // added for Skip/Join
+using System.Text.Json;
 
 namespace MobileProviderBillPaymentSystem.Controllers;
 
@@ -108,69 +111,46 @@ public class WebSiteController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");
 
-        var bills = new List<Bill>();
-
-        using (var stream = file.OpenReadStream())
-        using (var reader = new StreamReader(stream))
+        using var stream = file.OpenReadStream();
+        using var reader = new StreamReader(stream);
+        using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            string? line;
-            bool isFirstLine = true;
+            HasHeaderRecord = true,
+            
+        });
 
-            while ((line = await reader.ReadLineAsync()) != null)
+        var bills = new List<Bill>();
+        while (await csv.ReadAsync())
+        {
+            if (!csv.TryGetField(0, out int subscriberId)) continue;
+            if (!csv.TryGetField(1, out string monthStr)) continue;
+            if (!DateTime.TryParseExact(monthStr.Trim(), "yyyy-MM", CultureInfo.InvariantCulture, DateTimeStyles.None, out var billMonth)) continue;
+            if (!csv.TryGetField(2, out decimal billTotal)) continue;
+
+            string? billDetails = null;
+            if (csv.TryGetField(3, out string detailsRaw) && !string.IsNullOrWhiteSpace(detailsRaw))
             {
-                // Skip header row
-                if (isFirstLine)
+                string cleaned = detailsRaw;
+
+                // Remove wrapping quotes (CsvHelper keeps them)
+                if (cleaned.StartsWith("\"") && cleaned.EndsWith("\""))
+                    cleaned = cleaned.Substring(1, cleaned.Length - 2);
+
+                // Convert doubled quotes back to normal JSON quotes
+                cleaned = cleaned.Replace("\"\"", "\"");
+
+                try
                 {
-                    isFirstLine = false;
-                    continue;
+                    using var _ = JsonDocument.Parse(cleaned);
+                    billDetails = cleaned; // store valid JSON
                 }
-
-                var columns = line.Split(',');
-
-                if (columns.Length < 3)
-                    continue; // skip invalid rows
-
-                if (!int.TryParse(columns[0].Trim(), out int subscriberId))
-                    continue; // skip invalid subscriber id
-
-                var billMonth = DateTime.ParseExact(columns[1].Trim(), "yyyy-MM", CultureInfo.InvariantCulture);
-      ;
-
-                if (!decimal.TryParse(columns[2].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal billTotal))
-                    continue; // skip invalid total
-
-                string? billDetails = null;
-
-                if (columns.Length > 3)
+                catch (JsonException)
                 {
-                    var raw = columns[3].Trim();
-
-                    if (!string.IsNullOrEmpty(raw))
-                    {
-                        try
-                        {
-                            // Try parsing it as JSON to validate
-                            using var doc = System.Text.Json.JsonDocument.Parse(raw);
-
-                            // Store it as raw JSON string
-                            billDetails = raw;
-                        }
-                        catch (System.Text.Json.JsonException)
-                        {
-                            // Invalid JSON, skip this row or set to null
-                            billDetails = null;
-                        }
-                    }
+                    billDetails = null;
                 }
-
-                bills.Add(new Bill
-                {
-                    SubscriberId = subscriberId,
-                    BillMonth = billMonth,
-                    BillTotal = billTotal,
-                    BillDetails = billDetails
-                });
             }
+
+            bills.Add(new Bill { SubscriberId = subscriberId, BillMonth = billMonth, BillTotal = billTotal, BillDetails = billDetails });
         }
 
         if (!bills.Any())

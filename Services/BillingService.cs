@@ -2,6 +2,7 @@
 using MobileProviderBillPaymentSystem.Context;
 using MobileProviderBillPaymentSystem.Services.Interfaces;
 using MobileProviderBillPaymentSystem.Models;
+using System.Text.Json;
 
 namespace MobileProviderBillPaymentSystem.Services;
 
@@ -17,16 +18,16 @@ public class BillingService : IBillingService
     // --------------------------------------------------------
     // QUERY BILL (SUMMARY)
     // --------------------------------------------------------
-    public async Task<object?> QueryBillAsync(string subscriberNo, DateTime month)
+    public async Task<BillSummaryDto?> QueryBillAsync(string subscriberNo, DateTime month)
     {
         var bill = await _db.Bills
             .Include(b => b.Subscriber)
             .Where(b => b.Subscriber.SubscriberNo == subscriberNo &&
                         b.BillMonth == month)
-            .Select(b => new
+            .Select(b => new BillSummaryDto
             {
-                b.Subscriber.SubscriberNo,
-                Month = b.BillMonth,
+                SubscriberNo = b.Subscriber.SubscriberNo,
+                Month = b.BillMonth.ToString("yyyy-MM"),
                 BillTotal = b.BillTotal,
                 AmountPaid = b.AmountPaid,
                 PaidStatus = b.IsPaid ? "Paid" : "NotPaid"
@@ -36,45 +37,133 @@ public class BillingService : IBillingService
         return bill;
     }
 
+
     // --------------------------------------------------------
     // QUERY BILL (DETAILED)
     // --------------------------------------------------------
-    public async Task<object> QueryBillDetailedAsync(
-    string subscriberNo, DateTime month, int page, int pageSize)
+    public async Task<BillDetailsDto?> QueryBillDetailedAsync(
+        string subscriberNo,
+        DateTime month,
+        int page,
+        int pageSize)
     {
-        // Get query filtered from database
-        var query = _db.Payments
-            .Include(p => p.Bill)
-            .ThenInclude(b => b.Subscriber)
-            .Where(p => p.Bill.Subscriber.SubscriberNo == subscriberNo &&
-                        p.Bill.BillMonth == month)
-            .OrderBy(p => p.Id);
+        // Resolve the subscriber
+        Subscriber? subscriber = null;
+        if (int.TryParse(subscriberNo, out var numericId))
+        {
+            subscriber = await _db.Subscribers.FirstOrDefaultAsync(s => s.Id == numericId);
+        }
 
-        int totalItems = await query.CountAsync();
-        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+        subscriber ??= await _db.Subscribers
+            .FirstOrDefaultAsync(s => s.SubscriberNo == subscriberNo);
 
-        // Pull page into memory to allow client-side projection
-        var pageData = await query
+        if (subscriber == null)
+        {
+            return new BillDetailsDto
+            {
+                SubscriberNo = subscriberNo,
+                Month = month.ToString("yyyy-MM"),
+                TotalItems = 0,
+                TotalPages = 0,
+                Items = new List<BillDetailItemDto>(),
+            };
+        }
+
+        // Get bill
+        var bill = await _db.Bills
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.SubscriberId == subscriber.Id &&
+                                      b.BillMonth == month);
+
+        if (bill == null)
+        {
+            return new BillDetailsDto
+            {
+                SubscriberNo = subscriber.SubscriberNo,
+                Month = month.ToString("yyyy-MM"),
+                TotalItems = 0,
+                TotalPages = 0,
+                Items = new List<BillDetailItemDto>(),
+            };
+        }
+
+        // Deserialize bill details (JSON array) into JsonElements to avoid JsonElement -> IConvertible casts
+        var allItems = new List<Dictionary<string, JsonElement>>();
+        if (!string.IsNullOrWhiteSpace(bill.BillDetails))
+        {
+            try
+            {
+                var parsed = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(bill.BillDetails);
+                if (parsed != null)
+                    allItems = parsed;
+            }
+            catch (JsonException)
+            {
+                // invalid JSON — leave allItems empty and return empty paging below
+                allItems = new List<Dictionary<string, JsonElement>>();
+            }
+        }
+
+        var totalItems = allItems.Count;
+        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        var pageData = allItems
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync();
-
-        // Now do the projection in memory
-        var items = pageData
-            .Select((p, index) => new
-            {
-                LineNumber = index + 1 + ((page - 1) * pageSize),
-                Date = p.PaymentDate.ToString("yyyy-MM-dd"),
-                Description = "Payment",
-                Amount = p.Amount,
-                p.Status
-            })
             .ToList();
 
-        return new
+        // Convert to DTO items
+        var items = pageData.Select((p, index) =>
         {
-            SubscriberNo = subscriberNo,
+            // Safely read properties from JsonElement dictionary
+            string description = "Unknown";
+            if (p.TryGetValue("type", out var typeEl) && typeEl.ValueKind == JsonValueKind.String)
+                description = typeEl.GetString() ?? "Unknown";
+
+            decimal amount = 0m;
+            if (p.TryGetValue("cost", out var costEl))
+            {
+                if (costEl.ValueKind == JsonValueKind.Number && costEl.TryGetDecimal(out var d))
+                    amount = d;
+                else if (costEl.ValueKind == JsonValueKind.String && decimal.TryParse(costEl.GetString(), out var d2))
+                    amount = d2;
+            }
+
+            int? mb = null;
+            if (p.TryGetValue("mb", out var mbEl))
+            {
+                if (mbEl.ValueKind == JsonValueKind.Number && mbEl.TryGetInt32(out var mi))
+                    mb = mi;
+                else if (mbEl.ValueKind == JsonValueKind.String && int.TryParse(mbEl.GetString(), out var mi2))
+                    mb = mi2;
+            }
+
+            int? duration = null;
+            if (p.TryGetValue("duration", out var durEl))
+            {
+                if (durEl.ValueKind == JsonValueKind.Number && durEl.TryGetInt32(out var di))
+                    duration = di;
+                else if (durEl.ValueKind == JsonValueKind.String && int.TryParse(durEl.GetString(), out var di2))
+                    duration = di2;
+            }
+
+            return new BillDetailItemDto
+            {
+                LineNumber = index + 1 + ((page - 1) * pageSize),
+                Description = duration.HasValue ? $"{description} ({duration.Value}s)" : description,
+                Amount = amount,
+                DataMb = mb ?? 0,
+                DurationSeconds = duration ?? 0
+            };
+        }).ToList();
+
+        return new BillDetailsDto
+        {
+            SubscriberNo = subscriber.SubscriberNo,
             Month = month.ToString("yyyy-MM"),
+            BillTotal = bill.BillTotal,
+            AmountPaid = bill.AmountPaid,
+            IsPaid = bill.IsPaid,
             Page = page,
             PageSize = pageSize,
             TotalItems = totalItems,
@@ -82,6 +171,7 @@ public class BillingService : IBillingService
             Items = items
         };
     }
+
 
 
     // --------------------------------------------------------

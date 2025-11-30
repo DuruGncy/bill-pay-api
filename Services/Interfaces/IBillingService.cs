@@ -5,9 +5,9 @@ namespace MobileProviderBillPaymentSystem.Services.Interfaces;
 public interface IBillingService
 {
 
-    Task<object?> QueryBillAsync(string subscriberNo, DateTime month);
+    Task<BillSummaryDto?> QueryBillAsync(string subscriberNo, DateTime month);
 
-    Task<object> QueryBillDetailedAsync(
+    Task<BillDetailsDto?> QueryBillDetailedAsync(
         string subscriberNo, DateTime month,
         int page, int pageSize);
 

@@ -1,5 +1,37 @@
 [
   {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/v1/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MobileProviderBillPaymentSystem.Controllers.LoginDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/v1/auth/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "MobileProviderBillPaymentSystem.Controllers.LoginDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "MobileProviderBillPaymentSystem.Controllers.BankingAppController",
     "Method": "QueryBill",
     "RelativePath": "api/v1/BankingApp/query-bill",
@@ -87,7 +119,7 @@
     "Parameters": [
       {
         "Name": "subscriber",
-        "Type": "MobileProviderBillPaymentSystem.Models.Subscriber",
+        "Type": "MobileProviderBillPaymentSystem.Models.SubscriberDto",
         "IsRequired": true
       }
     ],
@@ -147,22 +179,6 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "MobileProviderBillPaymentSystem.Controllers.TokenController",
-    "Method": "GenerateToken",
-    "RelativePath": "api/v1/Token/token",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "jwtKey",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "MobileProviderBillPaymentSystem.Controllers.WebSiteController",
     "Method": "AddBill",
     "RelativePath": "api/v1/WebSite/admin/add-bill",
@@ -205,6 +221,15 @@
           "text/json"
         ],
         "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
       }
     ]
   },
@@ -216,16 +241,6 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [
-      {
-        "Name": "description",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "clientDate",
-        "Type": "System.DateTime",
-        "IsRequired": false
-      },
       {
         "Name": "file",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
@@ -246,6 +261,15 @@
           "text/json"
         ],
         "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
       }
     ]
   },
@@ -287,6 +311,15 @@
           "text/json"
         ],
         "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
       }
     ]
   }
