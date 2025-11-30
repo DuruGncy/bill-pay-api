@@ -145,11 +145,6 @@ Holds:
 
 ---
 
-## 🎥 Project Demo Video
-👉 *Insert your video link here*
-
----
-
 ## 📦 Source Code
 🔗 **REST API:** https://github.com/DuruGncy/bill-pay-api
 
